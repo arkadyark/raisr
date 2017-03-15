@@ -1,41 +1,54 @@
 import math
 
-M = 60
+M = 60.
 G = 9.8
-AIR_DRAG = 0.15
-FRICTION = 0.3
+AIR_DRAG = 0.25
+FRICTION = 0.1
+DEG_TO_RAD = math.pi / 180
+THETA = 30 * DEG_TO_RAD
+dt = 0.01
 
-def make_turn(a, b, left_foot_turn):
-    '''
-    Function that creates a parameterized half-ellipse
-    '''
-    def turn(t):
-        if left_foot_turn:
-            return (a*math.sin(t*math.pi), -b*math.cos(t*math.pi) + b)
-        else:
-            return (-a*math.sin(t*math.pi), -b*math.cos(t*math.pi) + b)
-    return turn
+def execute_step(control_angle, v_initial, pos):
+    control_angle += math.pi/2 # Angle relative to vertical
+    v = [v_initial * math.cos(control_angle), v_initial * math.sin(control_angle)]
+    pos = (pos[0] + v[0] * dt, pos[1] + v[1] * dt)
+    a = [-AIR_DRAG * v[0]**2/M - G*math.cos(THETA)*FRICTION*math.cos(control_angle), \
+         G*math.sin(THETA) - AIR_DRAG*v[1]**2/M - G*math.cos(THETA)*FRICTION*math.sin(control_angle)]
+    v_final = (v[0] + a[0]*dt, v[1] + a[1]*dt)
+    v_final = math.sqrt(v_final[0]**2 + v_final[1]**2)
+    return v_final, pos
 
-def get_duration(turn, t_final, v_initial, n_points=500):
-    last_pos = turn(0)
-    v = v_initial
-    duration = 0
-    for i in range(1, n_points):
-        current_pos = turn(i/float(n_points))
-        delta = (current_pos[0] - last_pos[0], current_pos[1] - last_pos[1])
-        d = (delta[0]**2 + delta[1]**2)**(0.5)
-        work_done = M*G*delta[1] - (AIR_DRAG*v**2 + M*G*FRICTION)*d
-        print v**2, 2*work_done/M, M*G*delta[1], M*G*FRICTION*d, delta[1], d
-        v_final = (max(v**2 + 2*work_done/M, 0))**(0.5)
-        duration +=  2*d/(v + v_final)
-        v = v_final
-        last_pos = current_pos
-    return duration, v
+if __name__ == '__main__':
+    # Demo physics
+    import matplotlib.pyplot as plt
+    pos = (0, 0)
+    xs = []
+    ys = []
+    v = 10
 
-v = 1
-t = 0
-for i in range(100):
-    turn = make_turn(1 + i, 1, i % 2)
-    turn_t, v = get_duration(turn, v)
-    t += turn_t
-    print t, v
+    print("TURN 1")
+    for i in range(50):
+        v, pos = execute_step((30 - 100*i/50.) * DEG_TO_RAD, v, pos)
+        xs.append(pos[0])
+        ys.append(pos[1])
+
+    print("TURN 2")
+    for i in range(50):
+        v, pos = execute_step((-70 + 100*i/50.) * DEG_TO_RAD, v, pos)
+        xs.append(pos[0])
+        ys.append(pos[1])
+
+    print("TURN 3")
+    for i in range(50):
+        v, pos = execute_step((30 - 100*i/50.) * DEG_TO_RAD, v, pos)
+        xs.append(pos[0])
+        ys.append(pos[1])
+
+    print("TURN 4")
+    for i in range(50):
+        v, pos = execute_step((-70 + 100*i/50.) * DEG_TO_RAD, v, pos)
+        xs.append(pos[0])
+        ys.append(pos[1])
+
+    plt.plot(xs, ys)
+    plt.show()
