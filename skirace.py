@@ -31,6 +31,7 @@ class SkiRaceState(StateSpace):
         Return the next gate in the course
         """
         for i in range(len(gates) - 1):
+            print(gates[i], pos)
             if gates[i][1] < pos[1] < gates[i + 1][1]:
                 return gates[i + 1]
 
@@ -44,7 +45,7 @@ class SkiRaceState(StateSpace):
         # TODO: Parameterize this / relate to dt
         possible_angles = [angle + 0.02*i for i in range(-5, 6)]
         # Filter out invalid angles - can only go down the hill
-        possible_angles = [a for a in possible_angles if 0 <= a <= math.pi]
+        possible_angles = [a for a in possible_angles if -math.pi/2 <= a <= math.pi/2]
         for angle in possible_angles:
             v_next, pos_next = physics.execute_step(angle, self.v, self.pos)
             if self.goes_around_gate(pos_next, self.next_gate):
@@ -85,7 +86,7 @@ def set_race(v_init, gates):
         None, # parent
         v_init, # initial speed
         (0, 0), # initial position
-        frozenset(gates + tuple(finish_line)))
+        gates + tuple(finish_line))
 
 """
 SkiRace Problem Set, for testing
