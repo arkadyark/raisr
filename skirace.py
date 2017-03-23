@@ -16,7 +16,7 @@ import physics
 import math
 
 DEGREES_PER_SECOND = 5
-BRANCHING_FACTOR = 8
+BRANCHING_FACTOR = 4
 
 class SkiRaceState(StateSpace):
     def __init__(self, action, time_so_far, parent, v, pos, gates):

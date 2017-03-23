@@ -1,14 +1,9 @@
 import os
 from search import *
 from skirace import *
+from heuristics import *
 
 INF = float('inf')
-
-def heur_dumb(state):
-    return 0
-
-def heur_slightly_less_dumb(state):
-    return -state.v
 
 def fval_function(sN, weight):
     return weight*sN.hval + sN.state.gval
@@ -46,8 +41,8 @@ if __name__ == '__main__':
     SkiRace Problem Set, for testing
     """
     PROBLEMS = (
-        set_race(3, ((1, 3), (-1, 6))),
-        #set_race(5, ((3, 3), (-3, 9), (3, 15), (-3, 21))),
+        #set_race(3, ((1, 3), (-1, 6))),
+        set_race(3, ((1, 3), (-1, 9), (2, 15), (-2, 21), (2, 29))),
         #set_race(3, ((4, 4), (-4, 12), (4, 20), (-4, 28)))
     )
 
