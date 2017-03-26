@@ -40,6 +40,7 @@
 import heapq
 from collections import deque
 import os
+import physics
 
 class StateSpace:
     '''Abstract class for defining State spaces for search routines'''
@@ -503,4 +504,44 @@ class SearchEngine:
 
         #end of while--OPEN is empty and no solution
         return False
+
+INF = float('inf')
+
+def fval_function(sN, weight):
+    return weight*sN.hval + sN.state.gval
+
+def skirace_goal_state(state):
+  """
+  Returns True if we have crossed the finish line
+  """
+  return state.next_gate == None
+
+def anytime_weighted_astar(initial_state, heur_fn, weight=1., timebound = 10):
+    '''Provides an implementation of anytime weighted a-star, as described in the HW1 handout'''
+    '''INPUT: a ski race state that represents the start state and a timebound (number of seconds)'''
+    '''OUTPUT: A goal state (if a goal is found), else False'''
+    g = INF
+    g_plus_h = INF
+    s = False
+    s_found = False
+    start_time = os.times()[0]
+    se = SearchEngine('custom', 'full')
+    se.init_search(initial_state, goal_fn=skirace_goal_state, heur_fn=heur_fn, fval_function = lambda sN: fval_function(sN, weight))
+    time_used = 0
+    while time_used < timebound:
+        time_used = os.times()[0] - start_time
+        current_s = se.search(timebound - time_used, (g, INF, g_plus_h))
+        if current_s:
+            g = current_s.gval - physics.dt
+            g_plus_h = g + heur_fn(current_s)
+            s_found = True
+        else:
+            # Nothing better found! Return the best we found
+            if s_found:
+                return s
+            else:
+                return current_s
+        s = current_s
+    print("Timed out!")
+    return s
 

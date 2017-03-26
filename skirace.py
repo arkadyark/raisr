@@ -16,7 +16,7 @@ import physics
 import math
 
 DEGREES_PER_SECOND = 5
-BRANCHING_FACTOR = 4
+BRANCHING_FACTOR = 5
 
 class SkiRaceState(StateSpace):
     def __init__(self, action, time_so_far, parent, v, pos, gates):
@@ -27,22 +27,24 @@ class SkiRaceState(StateSpace):
         self.v = v
         if not parent:
             self.depth = 0
+            self.all_gates = gates
         else:
             self.depth = parent.depth + 1
+            self.all_gates = parent.all_gates
         self.pos = pos
-        self.gates = gates
-        self.next_gate = self.get_next_gate(pos, gates)
+        self.gates, self.next_gate = self.get_next_gates(pos, self.all_gates)
         self.time_so_far = time_so_far
-        print(self.depth*" ", action, pos, self.next_gate)
+        #print(self.depth*" ", action, pos, self.next_gate)
 
-    def get_next_gate(self, pos, gates):
+    def get_next_gates(self, pos, gates, lookahead=3):
         """
         Return the next gate in the course
         """
-        if pos[1] < gates[0][1]: return gates[0]
+        if pos[1] < gates[0][1]: return (gates[:lookahead], gates[0])
         for i in range(len(gates) - 1):
             if gates[i][1] < pos[1] < gates[i + 1][1]:
-                return gates[i + 1]
+                return gates[:i + 1 + lookahead], gates[i + 1]
+        return None, None
 
     def successors(self):
         """
@@ -75,8 +77,6 @@ class SkiRaceState(StateSpace):
         Return whether or not pos goes around the next gate
         """
         if pos[1] >= next_gate[1]:
-            #import pdb; pdb.set_trace()
-            # right gate
             if self.gates.index(next_gate) % 2 == 0:
                 return (next_gate[0] - prev_pos[0]) * (pos[1] - prev_pos[1]) < (next_gate[1]- prev_pos[1]) * (pos[0] - prev_pos[0])
             else:
@@ -90,28 +90,22 @@ class SkiRaceState(StateSpace):
         import matplotlib.pyplot as plt
         xs = [self.pos[0]]
         ys = [self.pos[1]]
-        bounds = [min(i[0] for i in self.gates) - 5,
-                max(i[0] for i in self.gates) + 5,
-                0, max(i[1] for i in self.gates) + 5]
+        bounds = [min(i[0] for i in self.all_gates) - 5,
+                max(i[0] for i in self.all_gates) + 5,
+                0, max(i[1] for i in self.all_gates) + 2]
         parent = self.parent
         while parent:
             xs.insert(0, parent.pos[0])
             ys.insert(0, parent.pos[1])
             parent = parent.parent
         plt.plot(xs, ys)
-        for i in range(len(self.gates)):
-            gate = self.gates[i]
+        for i in range(len(self.all_gates)):
+            gate = self.all_gates[i]
             color = "b" if i % 2 else "r"
             plt.scatter(gate[0], gate[1], c=color)
-        plt.plot((bounds[0], bounds[1]), (self.gates[-1][1] + 1, self.gates[-1][1] + 1), c="r")
+        plt.plot((bounds[0], bounds[1]), (self.pos[1], self.pos[1]), c="r")
         plt.axis(bounds)
         plt.show()
-
-def skirace_goal_state(state):
-  """
-  Returns True if we have crossed the finish line
-  """
-  return state.pos[1] > state.gates[-1][1]
 
 def set_race(v_init, gates):
     """
