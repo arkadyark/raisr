@@ -10,7 +10,10 @@ def heur_dumb(state):
 
 def heur_slightly_less_dumb(state):
     if is_worthwhile(state) and is_gate_makeable(state):
-        return -state.v
+        if state.next_gate != None:
+            return -state.v * euclidean_distance(state.pos, state.next_gate)
+        else:
+            return -state.v
     else:
         return INF
 
