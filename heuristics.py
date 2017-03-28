@@ -1,7 +1,8 @@
-from skirace import DEGREES_PER_SECOND
+from skirace import DEGREES_PER_SECOND, BRANCHING_FACTOR
 from search import anytime_weighted_astar
 import math
 import copy
+import physics
 
 INF = float('inf')
 
@@ -15,6 +16,7 @@ def heur_slightly_less_dumb(state):
         else:
             return -state.v
     else:
+        print("Unmakeable:", state.pos, state.next_gate)
         return INF
 
 def euclidean_distance(v1, v2):
@@ -22,10 +24,37 @@ def euclidean_distance(v1, v2):
 
 def is_gate_makeable(state):
     if state.next_gate == None: return True
-    # If we go all the way in one direction, can we make it?
-    estimated_time = euclidean_distance(state.next_gate, state.pos) / state.v
-    angle_to_gate = math.atan((state.next_gate[1] - state.pos[1])/(state.next_gate[0] - state.pos[0]))
-    return abs(angle_to_gate) < estimated_time * DEGREES_PER_SECOND
+    prev_pos = None
+    p = state.pos
+    v = state.v
+    angle = state.action
+    print("new thing", p)
+
+    while p[1] < state.next_gate[1]:
+        min_angle = -DEGREES_PER_SECOND * physics.dt / 2. + angle
+        step = DEGREES_PER_SECOND * physics.dt / (BRANCHING_FACTOR - 1)
+        possible_angles = [min_angle + i * step for i in range(BRANCHING_FACTOR)]
+        # Filter out invalid angles - can only go down the hill
+        possible_angles = [a for a in possible_angles if -math.pi/2 <= a <= math.pi/2]
+
+        if p[0] < state.next_gate[0]:
+            angle = min(possible_angles)
+        else:
+            angle = max(possible_angles)
+
+        prev_pos = p
+        v , p = physics.execute_step(angle, v, p )
+        print(p, state.next_gate, angle)
+
+    if state.gates.index(state.next_gate) % 2 == 0:
+        return (state.next_gate[0] - prev_pos[0]) * (p[1] - prev_pos[1]) < (state.next_gate[1]- prev_pos[1]) * (p[0] - prev_pos[0])
+    else:
+        return (state.next_gate[0] - prev_pos[0]) * (p[1] - prev_pos[1]) > (state.next_gate[1]- prev_pos[1]) * (p[0] - prev_pos[0])
+
+    # # If we go all the way in one direction, can we make it?
+    #estimated_time = euclidean_distance(state.next_gate, state.pos) / state.v
+    #angle_to_gate = math.atan((state.next_gate[1] - state.pos[1])/(state.next_gate[0] - state.pos[0]))
+    #return abs(angle_to_gate) < estimated_time * DEGREES_PER_SECOND
 
 def is_worthwhile(state):
     if state.next_gate == None: return True
