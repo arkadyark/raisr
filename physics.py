@@ -3,10 +3,10 @@ import math
 M = 70.
 G = 9.8
 AIR_DRAG = 0.3
-FRICTION = 0.25
+FRICTION = 0.27
 DEG_TO_RAD = math.pi / 180
 THETA = 30 * DEG_TO_RAD
-dt = 0.3
+dt = 0.2
 
 def execute_step(control_angle, v_initial, pos):
     control_angle += math.pi/2 # Angle relative to vertical

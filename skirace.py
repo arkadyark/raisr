@@ -15,8 +15,9 @@ from search import *
 import physics
 import math
 
-DEGREES_PER_SECOND = 5
-BRANCHING_FACTOR = 5
+DEGREES_PER_SECOND = 6
+BRANCHING_FACTOR = 10
+VERBOSE = False
 
 class SkiRaceState(StateSpace):
     def __init__(self, action, time_so_far, parent, v, pos, gates):
@@ -34,7 +35,8 @@ class SkiRaceState(StateSpace):
         self.pos = pos
         self.gates, self.next_gate = self.get_next_gates(pos, self.all_gates)
         self.time_so_far = time_so_far
-        #print(self.depth*" ", action, pos, self.next_gate)
+        if VERBOSE:
+            print(self.depth*" ", action, pos, self.next_gate)
 
     def get_next_gates(self, pos, gates, lookahead=3):
         """
@@ -57,6 +59,11 @@ class SkiRaceState(StateSpace):
         possible_angles = [min_angle + i * step for i in range(BRANCHING_FACTOR)]
         # Filter out invalid angles - can only go down the hill
         possible_angles = [a for a in possible_angles if -math.pi/2 <= a <= math.pi/2]
+        if self.next_gate != None:
+            if self.pos[0] < self.next_gate[0]:
+                possible_angles = [a for a in possible_angles if a <= 0]
+            else:
+                possible_angles = [a for a in possible_angles if a >= 0]
         for angle in possible_angles:
             v_next, pos_next = physics.execute_step(angle, self.v, self.pos)
             if self.goes_around_gate(self.pos, pos_next, self.next_gate):

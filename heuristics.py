@@ -10,13 +10,12 @@ def heur_dumb(state):
     return 0 if is_worthwhile(state) else INF
 
 def heur_slightly_less_dumb(state):
-    if is_worthwhile(state) and is_gate_makeable(state):
+    if is_gate_makeable(state):
         if state.next_gate != None:
             return -state.v * euclidean_distance(state.pos, state.next_gate)
         else:
             return -state.v
     else:
-        print("Unmakeable:", state.pos, state.next_gate)
         return INF
 
 def euclidean_distance(v1, v2):
@@ -28,7 +27,6 @@ def is_gate_makeable(state):
     p = state.pos
     v = state.v
     angle = state.action
-    print("new thing", p)
 
     while p[1] < state.next_gate[1]:
         min_angle = -DEGREES_PER_SECOND * physics.dt / 2. + angle
@@ -36,7 +34,6 @@ def is_gate_makeable(state):
         possible_angles = [min_angle + i * step for i in range(BRANCHING_FACTOR)]
         # Filter out invalid angles - can only go down the hill
         possible_angles = [a for a in possible_angles if -math.pi/2 <= a <= math.pi/2]
-
         if p[0] < state.next_gate[0]:
             angle = min(possible_angles)
         else:
@@ -44,7 +41,6 @@ def is_gate_makeable(state):
 
         prev_pos = p
         v , p = physics.execute_step(angle, v, p )
-        print(p, state.next_gate, angle)
 
     if state.gates.index(state.next_gate) % 2 == 0:
         return (state.next_gate[0] - prev_pos[0]) * (p[1] - prev_pos[1]) < (state.next_gate[1]- prev_pos[1]) * (p[0] - prev_pos[0])
@@ -55,10 +51,3 @@ def is_gate_makeable(state):
     #estimated_time = euclidean_distance(state.next_gate, state.pos) / state.v
     #angle_to_gate = math.atan((state.next_gate[1] - state.pos[1])/(state.next_gate[0] - state.pos[0]))
     #return abs(angle_to_gate) < estimated_time * DEGREES_PER_SECOND
-
-def is_worthwhile(state):
-    if state.next_gate == None: return True
-    if state.next_gate[0] < state.pos[0]:
-        return state.action > 0
-    else:
-        return state.action < 0
