@@ -34,7 +34,8 @@ def is_gate_makeable(state):
         possible_angles = [min_angle + i * step for i in range(BRANCHING_FACTOR)]
         # Filter out invalid angles - can only go down the hill
         possible_angles = [a for a in possible_angles if -math.pi/2 <= a <= math.pi/2]
-        if p[0] < state.next_gate[0]:
+        #if p[0] < state.next_gate[0]:
+        if state.gates.index(state.next_gate) % 2 == 0:
             angle = min(possible_angles)
         else:
             angle = max(possible_angles)

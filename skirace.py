@@ -97,8 +97,8 @@ class SkiRaceState(StateSpace):
         import matplotlib.pyplot as plt
         xs = [self.pos[0]]
         ys = [self.pos[1]]
-        bounds = [min(i[0] for i in self.all_gates) - 5,
-                max(i[0] for i in self.all_gates) + 5,
+        bounds = [min(i[0] for i in self.all_gates) - 1,
+                max(i[0] for i in self.all_gates) + 1,
                 0, max(i[1] for i in self.all_gates) + 2]
         parent = self.parent
         while parent:
@@ -111,6 +111,7 @@ class SkiRaceState(StateSpace):
             color = "b" if i % 2 else "r"
             plt.scatter(gate[0], gate[1], c=color)
         plt.plot((bounds[0], bounds[1]), (self.pos[1], self.pos[1]), c="r")
+        plt.axis('scaled')
         plt.axis(bounds)
         plt.show()
 
