@@ -533,8 +533,8 @@ def anytime_weighted_astar(initial_state, heur_fn, weight=1., timebound = 10):
         current_s = se.search(timebound - time_used, (g, 2**31, g_plus_h))
         if current_s:
             current_s.plot_path()
-            g = current_s.gval - physics.dt
-            g_plus_h = g + heur_fn(current_s)
+            g = current_s.gval - physics.dt/2
+            g_plus_h = g + heur_fn(current_s) - physics.dt/2
             s_found = True
         else:
             # Nothing better found! Return the best we found

@@ -3,7 +3,7 @@ import math
 M = 70.
 G = 9.8
 AIR_DRAG = 0.3
-FRICTION = 0.27
+FRICTION = 0.3 #0.27
 DEG_TO_RAD = math.pi / 180
 THETA = 30 * DEG_TO_RAD
 dt = 0.2

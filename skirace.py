@@ -3,19 +3,13 @@
     A) Class SkiRaceState
 
     A specializion of the StateSpace Class that is tailored to the game of SkiRace.
-
-    B) class Direction
-
-    An encoding of the directions of movement that are possible for robots in SkiRace.
-
-    Code also contains a list of 40 SkiRace problems for the purpose of testing.
 """
 
 from search import *
 import physics
 import math
 
-DEGREES_PER_SECOND = 6
+DEGREES_PER_SECOND = 6.5
 BRANCHING_FACTOR = 10
 VERBOSE = False
 
