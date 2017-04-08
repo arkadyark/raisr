@@ -27,8 +27,10 @@ class Visualizer():
         pygame.init()
         gameDisplay = pygame.display.set_mode((Visualizer.WIDTH, Visualizer.HEIGHT))
         pygame.display.set_caption('RAISR')
+        font = pygame.font.SysFont('Sans', 32)
 
         self.N = 5
+        self.t = 0
 
         gameExit = False
         (racer_coords, x_bounds) = self.getRacerCoordsAndXBounds(skirace)
@@ -42,6 +44,9 @@ class Visualizer():
             self.drawRacer(gameDisplay, curr_pos)
             self.drawTrace(gameDisplay, curr_pos)
             self.drawTrees(gameDisplay, x_bounds)
+            text = font.render("{number:.{digits}f} seconds".format(number=self.t, digits=2), True, Visualizer.RED, Visualizer.WHITE)
+            self.t += round(dt/self.N, 2)
+            gameDisplay.blit(text, (0, 0))
             pygame.display.update()
             time.sleep(dt/self.N)
         time.sleep(5)
