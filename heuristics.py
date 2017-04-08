@@ -5,18 +5,29 @@ import copy
 import physics
 
 INF = float('inf')
-
+preprocessing = {}
 def heur_dumb(state):
     return 0 if is_worthwhile(state) else INF
 
 def heur_slightly_less_dumb(state):
+    if (state.pos == (0, 0)):
+        prev_gate = None
+        for gate in reversed(state.all_gates):
+            if not prev_gate:
+                preprocessing[gate] = 0
+                prev_gate = gate
+            else:
+                preprocessing[gate] = preprocessing[prev_gate] + euclidean_distance(gate, prev_gate)
     if is_gate_makeable(state):
         if state.next_gate != None:
-            return -state.v * euclidean_distance(state.pos, state.next_gate)
+            return 1/state.v * (euclidean_distance(state.pos, state.next_gate) + preprocessing[state.next_gate])
         else:
-            return -state.v
+            return -INF#-state.v
     else:
         return INF
+
+def projected_distance(pos, direction, next_gate):
+    return 0
 
 def euclidean_distance(v1, v2):
     return ((v1[0] - v2[0])**2 + (v1[1] - v2[1])**2)**(0.5)

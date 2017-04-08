@@ -79,9 +79,9 @@ class SkiRaceState(StateSpace):
         """
         if pos[1] >= next_gate[1]:
             if self.gates.index(next_gate) % 2 == 0:
-                return (next_gate[0] - prev_pos[0]) * (pos[1] - prev_pos[1]) < (next_gate[1]- prev_pos[1]) * (pos[0] - prev_pos[0])
+                return (next_gate[0] - prev_pos[0]) * (pos[1] - prev_pos[1]) + 0.25 < (next_gate[1]- prev_pos[1]) * (pos[0] - prev_pos[0])
             else:
-                return (next_gate[0] - prev_pos[0]) * (pos[1] - prev_pos[1]) > (next_gate[1]- prev_pos[1]) * (pos[0] - prev_pos[0])
+                return (next_gate[0] - prev_pos[0]) * (pos[1] - prev_pos[1]) - 0.25 > (next_gate[1]- prev_pos[1]) * (pos[0] - prev_pos[0])
         return True
 
     def plot_path(self):
