@@ -19,7 +19,7 @@ class Visualizer():
     D_GREEN=( 43, 111,  48)
     BROWN  =( 91,  69,  27)
 
-    SCALE = 10
+    SCALE = 17
 
     TRACE = []
 
@@ -29,7 +29,7 @@ class Visualizer():
         pygame.display.set_caption('RAISR')
 
         self.N = 5
-
+        Visualizer.SCALE = self.getScale(skirace) - 1
         gameExit = False
         (racer_coords, x_bounds) = self.getRacerCoordsAndXBounds(skirace)
         while not gameExit and len(racer_coords) != 0:
@@ -89,6 +89,11 @@ class Visualizer():
         pts.append(end)
         return pts
 
+    def getScale(self, skirace):
+        #start_y = skirace.all_gates[0][1]
+        end_y = skirace.all_gates[-1][1]
+        return Visualizer.HEIGHT // end_y
+
     def getRacerCoordsAndXBounds(self, skirace):
         racer_coords = [(round(Visualizer.WIDTH // 2 + skirace.pos[0]*Visualizer.SCALE), round(skirace.pos[1]*Visualizer.SCALE)) ]
         parent = skirace.parent
@@ -101,10 +106,6 @@ class Visualizer():
             next_pos = (next_x, next_y)
             pts = self.interpolate(self.N, prev_pos, next_pos)
             racer_coords += pts
-            #interpolated_pos = ( (prev_pos[0]+next_pos[0])//2, (prev_pos[1]+next_pos[1])//2 )
-            #print(interpolated_pos)
-            #racer_coords.append(interpolated_pos)
-            #racer_coords.append(next_pos)
             #update bounds
             if next_x < x_left_bound:
                 x_left_bound = next_x
@@ -115,8 +116,8 @@ class Visualizer():
         return (racer_coords, (x_left_bound, x_right_bound))
 
 if __name__ == '__main__':
-    skirace = set_race(2, ((0, 5), (0, 10), (0, 15), (0, 20), (0, 26), (-6, 32), (-2, 38), (-4, 44)))
-    weight = 10
+    skirace = set_race(2, ((0, 5), (0, 10), (0, 15), (0, 20), (0, 26), (-6, 32), (-2, 38), (-4, 44), (0, 50)))
+    weight = 2
     final = anytime_weighted_astar(skirace, heur_fn=heur_slightly_less_dumb, weight=weight, timebound=3000)
     if final:
         vis = Visualizer(final)
