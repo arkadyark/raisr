@@ -34,22 +34,32 @@ class Visualizer():
         self.t = 0
 
         gameExit = False
-        (racer_coords, x_bounds) = self.getRacerCoordsAndXBounds(skirace)
+        go = False
+        (racer_coords, speeds, x_bounds) = self.getRacerCoordsAndXBounds(skirace)
         while not gameExit and len(racer_coords) != 0:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     gameExit = True
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    go = True
             gameDisplay.fill(Visualizer.WHITE)
-            curr_pos = racer_coords.pop()
             self.drawRace(gameDisplay, skirace.all_gates)
-            self.drawRacer(gameDisplay, curr_pos)
-            self.drawTrace(gameDisplay, curr_pos)
             self.drawTrees(gameDisplay, x_bounds)
-            text = font.render("{number:.{digits}f} seconds".format(number=self.t, digits=2), True, Visualizer.RED, Visualizer.WHITE)
-            self.t += round(dt/self.N, 2)
-            gameDisplay.blit(text, (0, 0))
-            pygame.display.update()
-            time.sleep(dt/self.N)
+            if go:
+                curr_pos = racer_coords.pop()
+                curr_v = speeds.pop()
+                self.drawRacer(gameDisplay, curr_pos)
+                self.drawTrace(gameDisplay, curr_pos)
+                text = font.render("{number:.{digits}f} seconds".format(number=self.t, digits=2), True, Visualizer.RED, Visualizer.WHITE)
+                text2 = font.render("{number:.{digits}f} km/h".format(number=curr_v*3.6, digits=2), True, Visualizer.RED, Visualizer.WHITE)
+                self.t += round(dt/self.N, 2)
+                gameDisplay.blit(text, (0, 0))
+                gameDisplay.blit(text2, (0, 32))
+                pygame.display.update()
+                time.sleep(dt/self.N - 0.011)
+            else:
+                pygame.display.update()
+
         time.sleep(5)
         pygame.quit()
 
@@ -102,6 +112,7 @@ class Visualizer():
 
     def getRacerCoordsAndXBounds(self, skirace):
         racer_coords = [(round(Visualizer.WIDTH // 2 + skirace.pos[0]*Visualizer.SCALE), round(skirace.pos[1]*Visualizer.SCALE)) ]
+        vs = [skirace.v]
         parent = skirace.parent
         x_left_bound = Visualizer.WIDTH // 2
         x_right_bound = Visualizer.WIDTH // 2
@@ -112,6 +123,8 @@ class Visualizer():
             next_pos = (next_x, next_y)
             pts = self.interpolate(self.N, prev_pos, next_pos)
             racer_coords += pts
+            for i in range(self.N):
+                vs.append(parent.v)
             #update bounds
             if next_x < x_left_bound:
                 x_left_bound = next_x
@@ -119,15 +132,13 @@ class Visualizer():
                 x_right_bound = next_x
 
             parent = parent.parent
-        return (racer_coords, (x_left_bound, x_right_bound))
+        return (racer_coords, vs, (x_left_bound, x_right_bound))
 
 if __name__ == '__main__':
-    skirace = set_race(2, ((0, 5), (0, 10), (0, 15), (0, 20), (0, 26), (-6, 32), (-2, 38), (-4, 44), (0, 50)))
+    skirace = set_race(5, ((0, 5), (0, 10), (0, 15), (0, 20), (0, 26), (-8, 32), (-2, 38), (-4, 44), (2, 50)))
     weight = 2
-    final = anytime_weighted_astar(skirace, heur_fn=heur_slightly_less_dumb, weight=weight, timebound=3000)
+    final = anytime_weighted_astar(skirace, heur_fn=heur_slightly_less_dumb, weight=weight, timebound=10)
     if final:
         vis = Visualizer(final)
 
-    # TODO: display time
-    # TODO: scale by range of y
     # TODO: more courses
