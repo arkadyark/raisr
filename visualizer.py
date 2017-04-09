@@ -21,7 +21,7 @@ class Visualizer():
 
     SCALE = 17
 
-    TRACE = []
+    #TRACE = []
 
     def __init__(self, skirace=None):
         pygame.init()
@@ -32,6 +32,7 @@ class Visualizer():
         self.N = 5
         Visualizer.SCALE = self.getScale(skirace) - 1
         self.t = 0
+        self.TRACE = []
 
         gameExit = False
         go = False
@@ -45,6 +46,14 @@ class Visualizer():
             gameDisplay.fill(Visualizer.WHITE)
             self.drawRace(gameDisplay, skirace.all_gates)
             self.drawTrees(gameDisplay, x_bounds)
+
+            text = font.render("{number:.{digits}f} seconds".format(number=self.t, digits=2), True, Visualizer.RED, Visualizer.WHITE)
+            self.t += round(dt/self.N, 2)
+            gameDisplay.blit(text, (0, 0))
+            pygame.display.update()
+
+            time.sleep(dt/self.N)
+
             if go:
                 curr_pos = racer_coords.pop()
                 curr_v = speeds.pop()
@@ -92,11 +101,11 @@ class Visualizer():
         pygame.draw.line(gameDisplay, Visualizer.RED, (min_x, gates[-1][1] * Visualizer.SCALE), (max_x, gates[-1][1] * Visualizer.SCALE), 5)
 
     def drawTrace(self, gameDisplay, pos):
-        Visualizer.TRACE.append(pos)
-        if len(Visualizer.TRACE) >= 2:
-            for pt_idx in range(len(Visualizer.TRACE)-1):
-                pt1 = Visualizer.TRACE[pt_idx]
-                pt2 = Visualizer.TRACE[pt_idx+1]
+        self.TRACE.append(pos)
+        if len(self.TRACE) >= 2:
+            for pt_idx in range(len(self.TRACE)-1):
+                pt1 = self.TRACE[pt_idx]
+                pt2 = self.TRACE[pt_idx+1]
                 pygame.draw.line(gameDisplay, Visualizer.GREEN, pt1, pt2, 1)
 
     def interpolate(self, n, start, end):
