@@ -22,7 +22,7 @@ def heur_slightly_less_dumb(state):
         if state.next_gate != None:
             return 1/state.v * (euclidean_distance(state.pos, state.next_gate) + preprocessing[state.next_gate])
         else:
-            return -INF#-state.v
+            return 0#-state.v
     else:
         return INF
 

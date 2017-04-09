@@ -2,6 +2,7 @@ import os
 from heuristics import *
 from skirace import set_race
 from search import *
+from visualizer import *
 
 if __name__ == '__main__':
     """
@@ -23,4 +24,5 @@ if __name__ == '__main__':
         final = anytime_weighted_astar(s0, heur_fn=heur_slightly_less_dumb, weight=weight, timebound=3000)
 
         if final:
-            final.plot_path()
+            #final.plot_path()
+            vis = Visualizer(final)
