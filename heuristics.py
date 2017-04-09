@@ -10,6 +10,7 @@ def heur_dumb(state):
     return 0 if is_worthwhile(state) else INF
 
 def heur_slightly_less_dumb(state):
+    if state.next_gate == None: return 0
     if (state.pos == (0, 0)):
         prev_gate = None
         for gate in reversed(state.all_gates):
@@ -18,11 +19,9 @@ def heur_slightly_less_dumb(state):
                 prev_gate = gate
             else:
                 preprocessing[gate] = preprocessing[prev_gate] + euclidean_distance(gate, prev_gate)
-    if is_gate_makeable(state):
-        if state.next_gate != None:
-            return 1/state.v * (euclidean_distance(state.pos, state.next_gate) + preprocessing[state.next_gate])
-        else:
-            return 0#-state.v
+    makeable, x_distance = is_gate_makeable(state)
+    if makeable:
+        return 1/state.v * (euclidean_distance(state.pos, state.next_gate) + preprocessing[state.next_gate])
     else:
         return INF
 
@@ -34,10 +33,11 @@ def euclidean_distance(v1, v2):
 
 def is_gate_makeable(state):
     if state.next_gate == None: return True
-    prev_pos = None
+    prev_pos = state.pos
     p = state.pos
     v = state.v
     angle = state.action
+    v, p = physics.execute_step(angle, v, p)
 
     while p[1] < state.next_gate[1]:
         min_angle = -DEGREES_PER_SECOND * physics.dt / 2. + angle
@@ -54,12 +54,11 @@ def is_gate_makeable(state):
         prev_pos = p
         v , p = physics.execute_step(angle, v, p )
 
+    x_dist = abs(state.next_gate[0] - p[0])
     if state.gates.index(state.next_gate) % 2 == 0:
-        return (state.next_gate[0] - prev_pos[0]) * (p[1] - prev_pos[1]) < (state.next_gate[1]- prev_pos[1]) * (p[0] - prev_pos[0])
+        if (state.next_gate[0] - prev_pos[0]) * (p[1] - prev_pos[1]) < (state.next_gate[1]- prev_pos[1]) * (p[0] - prev_pos[0]):
+            return True, x_dist
     else:
-        return (state.next_gate[0] - prev_pos[0]) * (p[1] - prev_pos[1]) > (state.next_gate[1]- prev_pos[1]) * (p[0] - prev_pos[0])
-
-    # # If we go all the way in one direction, can we make it?
-    #estimated_time = euclidean_distance(state.next_gate, state.pos) / state.v
-    #angle_to_gate = math.atan((state.next_gate[1] - state.pos[1])/(state.next_gate[0] - state.pos[0]))
-    #return abs(angle_to_gate) < estimated_time * DEGREES_PER_SECOND
+        if (state.next_gate[0] - prev_pos[0]) * (p[1] - prev_pos[1]) > (state.next_gate[1]- prev_pos[1]) * (p[0] - prev_pos[0]):
+            return True, x_dist
+    return False, None

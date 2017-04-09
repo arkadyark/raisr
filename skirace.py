@@ -30,7 +30,7 @@ class SkiRaceState(StateSpace):
         self.gates, self.next_gate = self.get_next_gates(pos, self.all_gates)
         self.time_so_far = time_so_far
         if VERBOSE:
-            print(self.depth*" ", action, pos, self.next_gate)
+            print(self.depth*" ", round(self.gval, 2), pos, self.next_gate)
 
     def get_next_gates(self, pos, gates, lookahead=3):
         """
@@ -115,9 +115,10 @@ def set_race(v_init, gates):
     Add on a 'finish line' gate
     """
     left_foot_last = len(gates) % 2 + 1
+    finish_line = (gates[-1][0] + (-1)**(left_foot_last)*5, gates[-1][1] + 5)
     return SkiRaceState(0, # initial angle
         0, # initial time
         None, # parent
         v_init, # initial speed
         (0, 0), # initial position
-        gates)
+        gates + (finish_line,))

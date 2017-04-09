@@ -82,11 +82,14 @@ class Visualizer():
 
     def drawRace(self, gameDisplay, gates):
         COLORS = [Visualizer.RED, Visualizer.BLUE]
-        for gate_idx in range(len(gates)):
+        for gate_idx in range(len(gates) - 1):
             gate = [coord * Visualizer.SCALE for coord in list(gates[gate_idx])]
             # xcord centered around center of display
             gate[0] = Visualizer.WIDTH // 2 + gate[0]
             pygame.draw.circle(gameDisplay, COLORS[gate_idx % 2], gate, 3)
+        min_x = (min(g[0] for g in gates) - 2.5) * Visualizer.SCALE + Visualizer.WIDTH // 2
+        max_x = (max(g[0] for g in gates) + 2) * Visualizer.SCALE + Visualizer.WIDTH // 2
+        pygame.draw.line(gameDisplay, Visualizer.RED, (min_x, gates[-1][1] * Visualizer.SCALE), (max_x, gates[-1][1] * Visualizer.SCALE), 5)
 
     def drawTrace(self, gameDisplay, pos):
         Visualizer.TRACE.append(pos)
@@ -136,8 +139,8 @@ class Visualizer():
 
 if __name__ == '__main__':
     skirace = set_race(5, ((0, 5), (0, 10), (0, 15), (0, 20), (0, 26), (-8, 32), (-2, 38), (-4, 44), (2, 50)))
-    weight = 2
-    final = anytime_weighted_astar(skirace, heur_fn=heur_slightly_less_dumb, weight=weight, timebound=10)
+    weight = 10
+    final = anytime_weighted_astar(skirace, heur_fn=heur_slightly_less_dumb, weight=weight, timebound=1000)
     if final:
         vis = Visualizer(final)
 

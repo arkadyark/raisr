@@ -248,6 +248,7 @@ class SearchEngine:
     def __init__(self, strategy = 'depth_first', cc_level = 'default'):
         self.set_strategy(strategy, cc_level)
         self.trace = 0
+        self.deepest = 0
 
     def initStats(self):
         sNode.n = 0
@@ -396,6 +397,10 @@ class SearchEngine:
         while not self.open.empty():
             node = self.open.extract()
 
+            if node.gval > self.deepest:
+                self.deepest = node.gval
+                print("Furthest t searched to: {} seconds".format(node.gval))
+
             #BEGIN TRACING
             if self.trace:
                 print("   TRACE: Next State to expand: <S{}:{}:{}, g={}, h={}, f=g+h={}>".format(
@@ -536,6 +541,7 @@ def anytime_weighted_astar(initial_state, heur_fn, weight=1., timebound = 10):
             g = current_s.gval - physics.dt/2
             g_plus_h = g
             s_found = True
+            return current_s
         else:
             # Nothing better found! Return the best we found
             if s_found:
