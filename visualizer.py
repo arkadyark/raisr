@@ -142,7 +142,7 @@ class Visualizer():
         return (racer_coords, vs, (x_left_bound, x_right_bound))
 
 if __name__ == '__main__':
-    skirace = set_race(5, ((0, 5), (0, 10), (0, 15), (0, 20), (0, 26), (-8, 32), (-2, 38), (-4, 44), (2, 50)))
+    skirace = set_race(8, ((0, 5), (0, 10), (0, 15), (0, 20), (0, 26), (-8, 32), (-2, 38), (-4, 44), (2, 50)))
     weight = 10
     final = anytime_weighted_astar(skirace, heur_fn=heur_slightly_less_dumb, weight=weight, timebound=1000)
     if final:

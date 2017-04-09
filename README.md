@@ -10,3 +10,13 @@ This idea was conceived on a chairlift while skiing, to date the only scenario d
 It worked!
 
 ![dope](plots/dope.gif)
+
+## Running
+
+pygame and Python 3 are required (tested on CDF computers). Also needs a screen to run, so if connecting to CDF over SSH, `run ssh -X`. To run the search and display the solutions in the visualizer, use:
+
+```
+python3 visualizer.py
+```
+
+Once the search completes, click on the pygame window to start.
