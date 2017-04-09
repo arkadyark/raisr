@@ -46,13 +46,8 @@ class Visualizer():
             gameDisplay.fill(Visualizer.WHITE)
             self.drawRace(gameDisplay, skirace.all_gates)
             self.drawTrees(gameDisplay, x_bounds)
-
             text = font.render("{number:.{digits}f} seconds".format(number=self.t, digits=2), True, Visualizer.RED, Visualizer.WHITE)
-            self.t += round(dt/self.N, 2)
             gameDisplay.blit(text, (0, 0))
-            pygame.display.update()
-
-            time.sleep(dt/self.N)
 
             if go:
                 curr_pos = racer_coords.pop()

@@ -6,7 +6,7 @@ AIR_DRAG = 0.3
 FRICTION = 0.3 #0.27
 DEG_TO_RAD = math.pi / 180
 THETA = 30 * DEG_TO_RAD
-dt = 0.15
+dt = 0.20
 
 def execute_step(control_angle, v_initial, pos):
     control_angle += math.pi/2 # Angle relative to vertical
