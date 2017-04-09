@@ -21,7 +21,7 @@ class Visualizer():
 
     SCALE = 17
 
-    TRACE = []
+    #TRACE = []
 
     def __init__(self, skirace=None):
         pygame.init()
@@ -32,6 +32,7 @@ class Visualizer():
         self.N = 5
         Visualizer.SCALE = self.getScale(skirace) - 1
         self.t = 0
+        self.TRACE = []
 
         gameExit = False
         (racer_coords, x_bounds) = self.getRacerCoordsAndXBounds(skirace)
@@ -49,6 +50,7 @@ class Visualizer():
             self.t += round(dt/self.N, 2)
             gameDisplay.blit(text, (0, 0))
             pygame.display.update()
+
             time.sleep(dt/self.N)
         time.sleep(5)
         pygame.quit()
@@ -79,11 +81,11 @@ class Visualizer():
             pygame.draw.circle(gameDisplay, COLORS[gate_idx % 2], gate, 3)
 
     def drawTrace(self, gameDisplay, pos):
-        Visualizer.TRACE.append(pos)
-        if len(Visualizer.TRACE) >= 2:
-            for pt_idx in range(len(Visualizer.TRACE)-1):
-                pt1 = Visualizer.TRACE[pt_idx]
-                pt2 = Visualizer.TRACE[pt_idx+1]
+        self.TRACE.append(pos)
+        if len(self.TRACE) >= 2:
+            for pt_idx in range(len(self.TRACE)-1):
+                pt1 = self.TRACE[pt_idx]
+                pt2 = self.TRACE[pt_idx+1]
                 pygame.draw.line(gameDisplay, Visualizer.GREEN, pt1, pt2, 1)
 
     def interpolate(self, n, start, end):
@@ -128,6 +130,4 @@ if __name__ == '__main__':
     if final:
         vis = Visualizer(final)
 
-    # TODO: display time
-    # TODO: scale by range of y
     # TODO: more courses
