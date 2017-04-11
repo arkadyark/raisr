@@ -114,7 +114,7 @@ def set_race(v_init, gates):
     Returns initial state of a race, given the gates
     Add on a 'finish line' gate
     """
-    left_foot_last = len(gates) % 2
+    left_foot_last = len(gates) % 2 + 1
     finish_line = (gates[-1][0] + (-1)**(left_foot_last)*5, gates[-1][1] + 5)
     return SkiRaceState(0, # initial angle
         0, # initial time
